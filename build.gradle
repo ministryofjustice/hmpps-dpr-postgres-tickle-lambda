@@ -31,7 +31,6 @@ ext {
     hamcrestVersion = '2.2'
     mockitoVersion = '5.2.0'
     amazonSdkVersion = '1.12.590'
-    amazonRedShiftSdkVersion = '2.26.22'
     lambdaCoreVersion = '1.2.3'
     lambdaJavaEventsVersion = '3.11.3'
     systemLambdaVersion = '1.2.1'
@@ -39,14 +38,9 @@ ext {
 }
 
 dependencies {
-    implementation "com.amazonaws:aws-java-sdk-s3:$amazonSdkVersion"
-    implementation "com.amazonaws:aws-java-sdk-dynamodb:$amazonSdkVersion"
-    implementation "com.amazonaws:aws-java-sdk-stepfunctions:$amazonSdkVersion"
-    implementation "com.amazonaws:aws-java-sdk-glue:$amazonSdkVersion"
     implementation "com.amazonaws:aws-java-sdk-secretsmanager:$amazonSdkVersion"
     implementation "com.amazonaws:aws-lambda-java-core:$lambdaCoreVersion"
     implementation "com.amazonaws:aws-lambda-java-events:$lambdaJavaEventsVersion"
-    implementation "software.amazon.awssdk:redshiftdata:$amazonRedShiftSdkVersion"
     implementation "org.postgresql:postgresql:$postgresVersion"
 
     testImplementation "com.github.stefanbirkner:system-lambda:$systemLambdaVersion"

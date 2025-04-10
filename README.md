@@ -64,29 +64,6 @@ run the tests.
     ./gradlew clean check
 ```
 
-### Integration Tests
-
-```
-    ./gradlew clean integrationTest
-    ./gradlew clean check
-```
-
-### Acceptance Tests
-
-```
-    TBD
-```
-
-
-## Contributing
-
-Please adhere to the following guidelines when making contributions to the
-project.
-
-### Documentation
-
-- Keep all code commentary and documentation up to date
-
 ### Branch Naming
 
 - Use a JIRA ticket number where available
@@ -101,12 +78,3 @@ project.
 
 - Reference or link any relevant JIRA tickets in the pull request notes
 - At least one approval is required before a PR can be merged
-
-### Releases
-
-- v1.0.0
-
-## TODO
-
-- Modify the Dependabot file to suit the [dependency manager](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) you plan to use and for [automated pull requests for package updates](https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/enabling-and-disabling-dependabot-version-updates#enabling-dependabot-version-updates). Dependabot is enabled in the settings by default.
-- Ensure as many of the [GitHub Standards](https://github.com/ministryofjustice/github-repository-standards) rules are maintained as possibly can.
