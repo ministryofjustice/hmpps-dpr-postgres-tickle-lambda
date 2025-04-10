@@ -1,70 +1,112 @@
-# Ministry of Justice Template Repository
+# Ministry of Justice Digital Prison Reporting Postgres Tickle Lambdas
 
 [![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/template-repository/badge)](https://github-community.service.justice.gov.uk/repository-standards/template-repository)
 
-This template repository equips you with the default initial files required for a Ministry of Justice GitHub repository.
+#### CODEOWNER
 
-## Included Files
+- Team : [hmpps-digital-prison-reporting](https://github.com/orgs/ministryofjustice/teams/hmpps-digital-prison-reporting)
+- Email : digitalprisonreporting@digital.justice.gov.uk
 
-The repository comes with the following preset files:
+## Overview
 
-- LICENSE
-- .gitignore
-- CODEOWNERS
-- dependabot.yml
-- GitHub Actions example files
-- Ministry of Justice Compliance Badge (public repositories only)
+Code for the Postgres Tickle Lambda - a Lambda function that is used to periodically run `pg_logical_emit_message` so that
+replication slots keep making progress. This is useful when AWS DMS is connected to a Postgres read replica but no 
+changes occur in the tables monitored by DMS for long periods. Without periodically running the 'tickle', i.e. 
+`pg_logical_emit_message`, the read replica transaction log would keep using more and more disk space which would be 
+unable to be released. 
 
-## Setup Instructions
+## Local Development
 
-Once you've created your repository using this template, ensure the following steps:
+This project uses gradle which is bundled with the repository and also makes use
+of
 
-### Update README
+- [jacoco](https://docs.gradle.org/current/userguide/jacoco_plugin.html) - for test coverage reports
 
-Edit this README.md file to document your project accurately. Take the time to create a clear, engaging, and informative README.md file. Include information like what your project does, how to install and run it, how to contribute, and any other pertinent details.
+### Packaging
 
-### Update repository description
+This project makes use of the [shadow jar plugin](https://github.com/johnrengelman/shadow)
+which takes care of creating a jar containing all dependencies.
 
-After you've created your repository, GitHub provides a brief description field that appears on the top of your repository's main page. This is a summary that gives visitors quick insight into the project. Using this field to provide a succinct overview of your repository is highly recommended.
+The plugin adds the suffix `-all` to the jar file name e.g.
 
-This description and your README.md will be one of the first things people see when they visit your repository. It's a good place to make a strong, concise first impression. Remember, this is often visible in search results on GitHub and search engines, so it's also an opportunity to help people discover your project.
-
-### Grant Team Permissions
-
-Assign permissions to the appropriate Ministry of Justice teams. Ensure at least one team is granted Admin permissions. Whenever possible, assign permissions to teams rather than individual users.
-
-Prefer to user GitHub Teams over individual access to repositories. Where appropriate, ensure GitHub Teams used are related to a Parent Team associated with a Business Unit to help ensure ownership can be easily identified.
-
-### Read about the GitHub repository standards
-
-Familiarise yourself with the Ministry of Justice GitHub Repository Standards. These standards ensure consistency, maintainability, and best practices across all our repositories.
-
-You can find the standards [here](https://github-community.service.justice.gov.uk/repository-standards/guidance).
-
-Please read and understand these standards thoroughly and enable them when you feel comfortable.
-
-### Modify the GitHub Standards Badge
-
-Once you've ensured that all the [GitHub Repository Standards](https://github-community.service.justice.gov.uk/repository-standards/guidance) have been applied to your repository, it's time to update the Ministry of Justice (MoJ) Compliance Badge located in the README file.
-
-The badge demonstrates that your repository is compliant with MoJ's standards.
-
-To update the badge, replace the `template-repository` in the badge URL with your repository's name. The badge URL should look like this:
-
-```markdown
-[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/${your-repository-name}/badge)](https://github-community.service.justice.gov.uk/repository-standards/${your-reposistory-name})
+```
+    dpr-postgres-tickle-lambda-1.0-SNAPSHOT-all.jar
 ```
 
-**Please note** the badge will not function correctly if your repository is internal or private. In this case, you may remove the badge from your README.
+### Running a job
 
-### Update CODEOWNERS
+First, build the jar locally
 
-(Optional) Modify the CODEOWNERS file to specify the teams or users authorized to approve pull requests.
+```
+    ./gradlew clean shadowJar
+```
 
-### Configure Dependabot
+and then execute your lambda by specifying the fully qualified classname e.g.
 
-Adapt the dependabot.yml file to match your project's [dependency manager](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) and to enable [automated pull requests for package updates](https://docs.github.com/en/code-security/supply-chain-security).
+```
+    java -cp ./build/libs/dpr-postgres-tickle-lambda-1.0-SNAPSHOT-all.jar uk.gov.justice.digital.Placeholder
+```
 
-### Dependency Review
+ensuring that your lambda class has a handleRequest method that can be executed.
 
-If your repository is private with no GitHub Advanced Security license, remove the `.github/workflows/dependency-review.yml` file.
+## Testing
+
+> **Note** - test coverage reports are enabled by default and after running the
+> tests the report will be written to build/reports/jacoco/test/html
+
+### Unit Tests
+
+The unit tests use JUnit5 and Mockito where appropriate. Use the following to
+run the tests.
+
+```
+    ./gradlew clean test
+    ./gradlew clean check
+```
+
+### Integration Tests
+
+```
+    ./gradlew clean integrationTest
+    ./gradlew clean check
+```
+
+### Acceptance Tests
+
+```
+    TBD
+```
+
+
+## Contributing
+
+Please adhere to the following guidelines when making contributions to the
+project.
+
+### Documentation
+
+- Keep all code commentary and documentation up to date
+
+### Branch Naming
+
+- Use a JIRA ticket number where available
+- Otherwise a short descriptive name is acceptable
+
+### Commit Messages
+
+- Prefix any commit messages with the JIRA ticket number where available
+- Otherwise use the prefix `NOJIRA`
+
+### Pull Requests
+
+- Reference or link any relevant JIRA tickets in the pull request notes
+- At least one approval is required before a PR can be merged
+
+### Releases
+
+- v1.0.0
+
+## TODO
+
+- Modify the Dependabot file to suit the [dependency manager](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) you plan to use and for [automated pull requests for package updates](https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/enabling-and-disabling-dependabot-version-updates#enabling-dependabot-version-updates). Dependabot is enabled in the settings by default.
+- Ensure as many of the [GitHub Standards](https://github.com/ministryofjustice/github-repository-standards) rules are maintained as possibly can.
