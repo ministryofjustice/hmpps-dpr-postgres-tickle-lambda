@@ -15,7 +15,7 @@ workflows:
           cache_key: "dpr-lambdas-build-cache-v2"
       - reporting/gradle_build_publish:
           tag: "11.0"
-          app: dpr-postgres-tickle-lambda
+          app: hmpps-dpr-postgres-tickle-lambda
           app_artifacts_directory: build/libs/
           bucket_prefix: dpr-artifact-store
           sync_args: "--exclude '*' --include '*-all*jar'"
@@ -52,4 +52,4 @@ workflows:
           context:
             - hmpps-reporting-common
             - hmpps-reporting-orb
-          cache_key: "dpr-postgres-tickle-lambda-owasp-build-cache-v1"
+          cache_key: "hmpps-dpr-postgres-tickle-lambda-owasp-build-cache-v1"
