@@ -1,0 +1,91 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'org.sonarqube'  version '3.5.0.2730'
+    id 'org.owasp.dependencycheck'  version '8.2.1'
+    id 'org.gradle.java-test-fixtures'
+    id 'org.barfuin.gradle.jacocolog' version '3.1.0'
+}
+
+group 'uk.gov.justice'
+
+version "${version != 'unspecified' ? version : '0.0.13-SNAPSHOT'}"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+jacoco {
+    toolVersion = "0.8.8" // Adjust the version if needed
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    junitVersion = '5.10.1'
+    hamcrestVersion = '2.2'
+    mockitoVersion = '5.2.0'
+    amazonSdkVersion = '1.12.590'
+    lambdaCoreVersion = '1.2.3'
+    lambdaJavaEventsVersion = '3.11.3'
+    systemLambdaVersion = '1.2.1'
+    postgresVersion = '42.7.5'
+}
+
+dependencies {
+    implementation "com.amazonaws:aws-java-sdk-secretsmanager:$amazonSdkVersion"
+    implementation "com.amazonaws:aws-lambda-java-core:$lambdaCoreVersion"
+    implementation "com.amazonaws:aws-lambda-java-events:$lambdaJavaEventsVersion"
+    implementation "org.postgresql:postgresql:$postgresVersion"
+
+    testImplementation "com.github.stefanbirkner:system-lambda:$systemLambdaVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    // https://mvnrepository.com/artifact/org.mockito/mockito-inline
+    testImplementation "org.mockito:mockito-inline:$mockitoVersion"
+    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+    testImplementation "org.hamcrest:hamcrest:$hamcrestVersion"
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = false
+        html.required = true
+    }
+}
+
+shadowJar {
+    zip64 true
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += [
+        "-Xlint:all"
+    ]
+}
+
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+    println("\nUsing $maxParallelForks executors")
+}
+
+assemble {
+  dependsOn shadowJar
+}
